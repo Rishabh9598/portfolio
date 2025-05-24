@@ -69,7 +69,7 @@ const DataVisualization: React.FC = () => {
       .text('Exam Score');
 
     // Add dots
-    const dots = svg.selectAll('circle')
+    svg.selectAll('circle')
       .data(data)
       .enter()
       .append('circle')

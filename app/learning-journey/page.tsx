@@ -187,7 +187,7 @@ export default function LearningJourney() {
               whileTap={{ scale: 0.95 }}
               className="px-6 py-3 rounded-lg bg-[#CFAEFF] text-black font-semibold hover:bg-white transition-colors"
             >
-              Let's Connect
+              Let&apos;s Connect
             </motion.button>
           </Link>
         </motion.div>

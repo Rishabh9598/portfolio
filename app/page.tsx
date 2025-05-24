@@ -1,16 +1,9 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import emailjs from '@emailjs/browser';
-import dynamic from 'next/dynamic';
-import DataVisualization from './components/DataVisualization';
-
-// Dynamically import Monaco Editor to avoid SSR issues
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
-  ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-[#23232A] rounded-lg animate-pulse" />
-});
 
 type SkillKey = 'Python' | 'Data Analysis' | 'Machine Learning' | 'Visualization' | 'Problem Solving';
 
@@ -22,34 +15,6 @@ interface SkillDetail {
 interface SkillDetails {
   [key: string]: SkillDetail;
 }
-
-interface Project {
-  title: string;
-  description: string;
-  image: string;
-  link: string;
-}
-
-const projects: Project[] = [
-  {
-    title: "Real Estate Price Prediction",
-    description: "Machine learning model to predict property prices based on various features",
-    image: "/real-estate.jpg",
-    link: "#"
-  },
-  {
-    title: "Social Media Engagement Dashboard",
-    description: "Interactive dashboard for analyzing social media metrics and engagement",
-    image: "https://blog.socialchamp.com/wp-content/uploads/2024/04/Content-Blog-Banner_Q2-2024_1125x600_034_Social-Media-Engagement.png",
-    link: "#"
-  },
-  {
-    title: "Mood-Based Music Recommender",
-    description: "AI-powered music recommendation system based on user mood and preferences",
-    image: "https://img.freepik.com/free-vector/music-concept-illustration_114360-1206.jpg",
-    link: "#"
-  }
-];
 
 export default function Home() {
   const { scrollYProgress } = useScroll();
@@ -95,15 +60,6 @@ export default function Home() {
     }));
     setStars(generatedStars);
   }, []);
-
-  // Add refs for project animations
-  const project1Ref = React.useRef(null);
-  const project2Ref = React.useRef(null);
-  const project3Ref = React.useRef(null);
-
-  const project1InView = useInView(project1Ref, { once: false, amount: 0.5 });
-  const project2InView = useInView(project2Ref, { once: false, amount: 0.5 });
-  const project3InView = useInView(project3Ref, { once: false, amount: 0.5 });
 
   const skillDetails: SkillDetails = {
     'Python': {
@@ -160,10 +116,7 @@ export default function Home() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{
-    type: 'success' | 'error' | null;
-    message: string;
-  }>({ type: null, message: '' });
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -178,7 +131,7 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: '' });
+    setSubmitStatus('idle');
 
     try {
       await emailjs.sendForm(
@@ -188,16 +141,10 @@ export default function Home() {
         'qJE1knjg87jA946yE'
       );
 
-      setSubmitStatus({
-        type: 'success',
-        message: 'Message sent successfully! I will get back to you soon.'
-      });
+      setSubmitStatus('success');
       setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      setSubmitStatus({
-        type: 'error',
-        message: 'Failed to send message. Please try again later.'
-      });
+    } catch {
+      setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
@@ -362,16 +309,12 @@ export default function Home() {
                   transform: 'translateZ(0)',
                 }}
               >
-                <div className="w-full h-40 rounded-xl mb-4 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10" />
-                  <img 
+                <div className="relative w-full h-48 overflow-hidden rounded-t-lg">
+                  <Image
                     src={project.image}
                     alt={project.title}
-                    className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                    style={{
-                      willChange: 'transform',
-                      transform: 'translateZ(0)',
-                    }}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 text-center group-hover:text-[#CFAEFF] transition-colors duration-300">
@@ -412,20 +355,20 @@ export default function Home() {
         <div className="w-full max-w-4xl flex flex-col md:flex-row items-center gap-10 md:gap-16 bg-[#23232A]/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-14 transform-gpu hover:scale-[1.02] transition-transform duration-500">
           {/* Image with enhanced 3D effect */}
           <div className="flex-shrink-0 transform-gpu hover:scale-105 transition-transform duration-300">
-            <img
-              src="/rishu.jpg"
-              alt="Rishabh portrait"
-              className="w-40 h-48 object-cover rounded-2xl shadow-lg border-4 border-[#CFAEFF]/30 transform-gpu hover:rotate-3 transition-transform duration-300"
-              style={{
-                boxShadow: '0 0 30px rgba(207, 174, 255, 0.2)',
-              }}
-            />
+            <div className="relative w-32 h-32 rounded-full overflow-hidden mb-6">
+              <Image
+                src="/rishu.jpg"
+                alt="Rishabh Shukla"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
           {/* About Content with enhanced typography */}
           <div className="flex-1 flex flex-col items-center md:items-start">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 font-sans transform-gpu hover:scale-105 transition-transform duration-300">About Rishabh</h2>
-            <p className="text-white/90 text-base sm:text-lg mb-6 text-center md:text-left backdrop-blur-sm bg-white/5 p-4 rounded-xl">
-              I'm a second-year Computer Science student with a Data Science specialization, passionate about solving real-world problems through data. I blend logic with creativity to find meaningful insights in chaos.
+            <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg mb-6 text-center md:text-left backdrop-blur-sm bg-white/5 p-4 rounded-xl">
+              I&apos;m a second-year Computer Science student with a Data Science specialization, passionate about solving real-world problems through data. I blend logic with creativity to find meaningful insights in chaos.
             </p>
             <div className="flex flex-wrap gap-3 mb-2 justify-center md:justify-start">
               {(Object.keys(skillDetails) as SkillKey[]).map((tag) => (
@@ -517,7 +460,7 @@ export default function Home() {
       {/* Enhanced Contact section with glassmorphism */}
       <section className="relative z-10 w-full flex justify-center py-20 px-2 bg-black" id="contact">
         <div className="w-full max-w-3xl flex flex-col items-center bg-[#18181C]/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-14 transform-gpu hover:scale-[1.02] transition-transform duration-500">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 font-sans text-center transform-gpu hover:scale-105 transition-transform duration-300">Let's Connect</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 font-sans text-center transform-gpu hover:scale-105 transition-transform duration-300">Let&apos;s Connect</h2>
           {/* Contact Buttons with enhanced 3D effects */}
           <div className="flex flex-wrap gap-4 justify-center mb-8">
             <motion.a
@@ -627,15 +570,22 @@ export default function Home() {
                 boxShadow: '0 0 20px rgba(207, 174, 255, 0.1)',
               }}
             />
-            {submitStatus.type && (
+            {submitStatus === 'success' && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`p-3 rounded-lg text-sm ${
-                  submitStatus.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                }`}
+                className="p-3 rounded-lg text-sm bg-green-500/20 text-green-400"
               >
-                {submitStatus.message}
+                Message sent successfully! I will get back to you soon.
+              </motion.div>
+            )}
+            {submitStatus === 'error' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 rounded-lg text-sm bg-red-500/20 text-red-400"
+              >
+                Failed to send message. Please try again later.
               </motion.div>
             )}
             <motion.button
